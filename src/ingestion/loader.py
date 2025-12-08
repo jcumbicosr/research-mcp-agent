@@ -33,15 +33,11 @@ def load_and_clean_pdf(pdf_path: str) -> Dict[str, str]:
         title = meta.title if meta and meta.title else "Unknown Title"
         author = meta.author if meta and meta.author else "Unknown Author"
         keywords = meta.keywords if meta and meta.keywords else "No Keywords"
-        date = meta.creation_date if meta and meta.creation_date else "Unknown Date"
-        if isinstance(date, datetime.datetime):
-            date = date.strftime("%Y-%m-%d")
 
         # Extract text from each page
         text = ""
         for page in reader.pages:
-            # extraction_mode="layout" helps maintain reading order in some multi-column papers
-            page_text = page.extract_text(extraction_mode="layout")
+            page_text = page.extract_text()
             text += page_text + "\n"
         
         # Clean the extracted text
@@ -49,9 +45,8 @@ def load_and_clean_pdf(pdf_path: str) -> Dict[str, str]:
 
         return {
             "title": title,
-            "author": author,
+            "authors": author,
             "keywords": keywords,
-            "date": date,
             "text": text
         }
     
@@ -97,8 +92,46 @@ def clean_text(raw_text: str) -> str:
 
     return text.strip()
 
+def process_pdfs(directory: str="data/raw_articles/"):
+    """
+    Process all PDF files in a directory and its subdirectories.
+    Recursively iterates through subdirectories, loads and cleans PDF files,
+    and enriches them with metadata including the area (subdirectory name) and filename.
+    Args:
+        directory (str): Path to the directory containing subdirectories with PDF files.
+    Returns:
+        list: A list of dictionaries containing processed PDF data with the following keys:
+            - Existing keys from load_and_clean_pdf output
+            - 'area' (str): Name of the subdirectory where the PDF was found
+            - 'filename' (str): Name of the PDF file
+    Raises:
+        NotADirectoryError: If the specified directory does not exist or is not a directory.
+    """
+
+    dir = Path(directory)
+
+    if not dir.exists() or not dir.is_dir():
+        raise NotADirectoryError(f"The directory {directory} does not exist or is not a directory.")
+    
+    # Iterate over all subdirectories
+    documents = []
+    for subdir in dir.iterdir():
+        if subdir.is_dir():
+            # Process PDFs in the subdirectory
+            print(f"Processing area: {subdir.name}...")
+
+            for pdf_file in subdir.glob("*.pdf"):
+                pdf_data = load_and_clean_pdf(pdf_file)
+                
+                # Add metadata
+                if pdf_data:
+                    pdf_data['area'] = subdir.name
+                    pdf_data['filename'] = pdf_file.name
+                    
+                    documents.append(pdf_data)
+
+    return documents
 
 if __name__ == "__main__":
-    pdf_path = "data/raw_articles/economy/economy_01.pdf"
-    pdf_data = load_and_clean_pdf(pdf_path)
-    print(pdf_data.get("text", ""))
+    docs = process_pdfs()
+    print(f"Processed {len(docs)} documents.")
