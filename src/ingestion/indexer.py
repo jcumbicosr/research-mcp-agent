@@ -1,7 +1,7 @@
 import nltk
 import chromadb
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Any
 
 
 # Download required NLTK resources
@@ -67,7 +67,7 @@ def chunk_pdfs(documents: List[Dict[str, str]], max_sentences: int = 5, overlap:
     return chunked_documents
 
 class ChromaIndexer:
-    def __init__(self, persist_directory: str = "data/vector_store/"):
+    def __init__(self, persist_directory: str = "data/vector_store/") -> None:
         """
         Initialize a ChromaDB client with persistent storage.
 
@@ -77,15 +77,16 @@ class ChromaIndexer:
         path_dir = Path(persist_directory)
         path_dir.mkdir(parents=True, exist_ok=True)
 
-        self.client = chromadb.Client(chromadb.config.Settings(
-            persist_directory=persist_directory
-        ))
+        # Use PersistentClient
+        self.client = chromadb.PersistentClient(path=persist_directory)
 
         self.collection = self.client.get_or_create_collection(name="scientific_articles")
         if self.collection.count() == 0:
             print("The ChromaDB collection is void. Run create_collection() to initialize it.")
+        else:
+            print(f"Loaded existing collection with {self.collection.count()} documents.")
         
-    def create_collection(self, documents: List[Dict[str, str]]):
+    def create_collection(self, documents: List[Dict[str, str]]) -> None:
         """
         Add documents to the ChromaDB collection.
         
@@ -116,6 +117,23 @@ class ChromaIndexer:
             metadatas=metadatas,
             ids=ids
         )
+        print(f"Added {len(documents)} documents. Total in collection: {self.collection.count()}")
+
+    def query(self, query_texts: List[str], n_results: int = 1) -> Dict[str, Any]:
+        """
+        Query the collection for similar items based on input text.
+        
+        Args:
+            query_texts (List[str]): A list of query strings to search for in the collection.
+            n_results (int, optional): The number of results to return for each query. Defaults to 1.
+        
+        Returns:
+            Dict[str, Any]: A dictionary containing the query results from the collection.
+        """
+        return self.collection.query(
+            query_texts=query_texts,
+            n_results=n_results,
+        )
 
 if __name__ == "__main__":
     # Example usage
@@ -131,4 +149,7 @@ if __name__ == "__main__":
 
     vector_db = ChromaIndexer()
     vector_db.create_collection(chunked_docs)
+
+    results = vector_db.query(["First sentence"], n_results=2)
+    print(f"Retrieve docs:\n{results["documents"]}")
 
