@@ -1,8 +1,7 @@
 import re
-import datetime
 from pypdf import PdfReader
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 
 def load_and_clean_pdf(pdf_path: str) -> Dict[str, str]:
     """
@@ -92,7 +91,7 @@ def clean_text(raw_text: str) -> str:
 
     return text.strip()
 
-def process_pdfs(directory: str="data/raw_articles/"):
+def process_pdfs(directory: str="data/raw_articles/") -> List[Dict[str, str]]:
     """
     Process all PDF files in a directory and its subdirectories.
     Recursively iterates through subdirectories, loads and cleans PDF files,
