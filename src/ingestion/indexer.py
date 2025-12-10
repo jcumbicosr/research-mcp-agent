@@ -130,10 +130,34 @@ class ChromaIndexer:
         Returns:
             Dict[str, Any]: A dictionary containing the query results from the collection.
         """
-        return self.collection.query(
+        results = self.collection.query(
             query_texts=query_texts,
             n_results=n_results,
+            include=["metadatas", "distances", "documents"]
         )
+
+        # Flatten the ChromaDB result structure
+        output = {
+            'ids': results['ids'][0] if results.get('metadatas') else [],
+            'documents': results['documents'][0] if results.get('documents') else [],
+            'distances': results['distances'][0] if results.get('distances') else [],
+        }
+
+        # Flatten metadata keys into top-level dictionary
+        if results.get('metadatas') and results['metadatas'][0]:
+            # Collect all unique metadata keys
+            all_metadata_keys = set()
+            for metadata in results['metadatas'][0]:
+                all_metadata_keys.update(metadata.keys())
+            
+            # Create a list for each metadata key
+            for key in all_metadata_keys:
+                output[key] = [
+                    metadata.get(key, None) for metadata in results['metadatas'][0]
+                ]
+        
+        return output
+
 
 if __name__ == "__main__":
     # Example usage
@@ -151,5 +175,5 @@ if __name__ == "__main__":
     vector_db.create_collection(chunked_docs)
 
     results = vector_db.query(["First sentence"], n_results=2)
-    print(f"Retrieve docs:\n{results["documents"]}")
+    print(f"Retrieve docs:\n{results['documents']}")
 
