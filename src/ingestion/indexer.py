@@ -2,6 +2,7 @@ import nltk
 import chromadb
 from pathlib import Path
 from typing import List, Dict, Any
+from .loader import process_pdfs
 
 
 # Download required NLTK resources
@@ -157,23 +158,37 @@ class ChromaIndexer:
                 ]
         
         return output
+    
+def main():
+    # Load and clead pdf files, add metadata
+    docs = process_pdfs(directory="data/raw_articles/")
+    # Chunk text
+    docs = chunk_pdfs(documents=docs, max_sentences=8, overlap=1)
+    # Create vector store
+    vector_db = ChromaIndexer(persist_directory="data/vector_store")
+    vector_db.create_collection(documents=docs)
+    # Test retrieve
+    results = vector_db.query(["Sentence talking about machine learning."], n_results=2)
+    print(f"Retrieve docs:\n{results['documents']}")
 
 
 if __name__ == "__main__":
+    main()
+
     # Example usage
-    sample_documents = [
-        {'text': "This is the first sentence. Here is the second sentence. This makes the third sentence. Fourth sentence is here. Finally, this is the fifth sentence."},
-        {'text': "Another document starts here. It has its own sentences. This is the third one. Fourth comes next. And finally, the fifth sentence."}
-    ]
+    # sample_documents = [
+    #     {'text': "This is the first sentence. Here is the second sentence. This makes the third sentence. Fourth sentence is here. Finally, this is the fifth sentence."},
+    #     {'text': "Another document starts here. It has its own sentences. This is the third one. Fourth comes next. And finally, the fifth sentence."}
+    # ]
     
-    chunked_docs = chunk_pdfs(sample_documents, max_sentences=3, overlap=1)
+    # chunked_docs = chunk_pdfs(sample_documents, max_sentences=3, overlap=1)
     
-    for doc in chunked_docs:
-        print(f"Chunk Index: {doc['index']}, Text: {doc['text']}\n")
+    # for doc in chunked_docs:
+    #     print(f"Chunk Index: {doc['index']}, Text: {doc['text']}\n")
 
-    vector_db = ChromaIndexer()
-    vector_db.create_collection(chunked_docs)
+    # vector_db = ChromaIndexer()
+    # vector_db.create_collection(chunked_docs)
 
-    results = vector_db.query(["First sentence"], n_results=2)
-    print(f"Retrieve docs:\n{results['documents']}")
+    # results = vector_db.query(["First sentence"], n_results=2)
+    # print(f"Retrieve docs:\n{results['documents']}")
 

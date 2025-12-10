@@ -6,6 +6,7 @@ dist/
 wheels/
 data/vector_store
 *.egg-info
+.vscode
 
 # Virtual environments
 .venv
