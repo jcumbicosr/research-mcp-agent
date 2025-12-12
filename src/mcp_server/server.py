@@ -1,5 +1,5 @@
+from fastmcp import FastMCP
 from typing import List, Dict, Any
-from mcp.server.fastmcp import FastMCP
 from src.ingestion.indexer import ChromaIndexer
 
 # Initialize the FastMCP Server
@@ -94,7 +94,5 @@ def get_article_content(article_id: str) -> Dict[str, Any]:
     }
 
 if __name__ == "__main__":
-    # mcp.run(transport="stdio")
-    results = search_articles("machine learning")
-    
-    print("DONE")
+    mcp.run(transport="stdio")
+
