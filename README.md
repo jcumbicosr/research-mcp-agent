@@ -54,3 +54,27 @@ The system uses **ChromaDB** as the persistent vector store.
 * **Storage Path:** `data/vector_store/`
 
 * **Metadata Filtering:** Each vector is indexed with its source filename, research area, and document metadata to allow for filtered queries (e.g., "Retrieve only from Computer_Science").
+
+
+## 🤖 MCP Server Architecture
+This project exposes the knowledge base to AI agents using the **Model Context Protocol (MCP)** via a `FastMCP` server. This architecture decouples the database logic from the agentic reasoning, allowing the agent to "consult" the literature dynamically.
+
+## 🤖 MCP Server Architecture
+
+This project exposes the knowledge base to AI agents using the **Model Context Protocol (MCP)** via a `FastMCP` server. This architecture decouples the database logic from the agentic reasoning, allowing the agent to "consult" the literature dynamically.
+
+### Server Tools
+The server exposes two primary tools designed to support an **Agentic Classification Workflow**:
+
+#### 1. `search_articles`
+**Purpose:** Semantic Search & Classification Helper. This is the primary entry point for the agent. It performs a semantic search on the Vector Store to find the most relevant articles based on a query or summary.
+* **Inputs:** `query` (str), `n_results` (int, default=3).
+* **Output:** List of article metadata (ID, Title, Area, Similarity Score).
+* **Agent Strategy:** The agent uses this tool to infer the classification of a new input text by analyzing the `area` field of the nearest neighbors returned by this search.
+
+
+#### 2. `get_article_content`
+**Purpose:** Deep Inspection & Verification. Retrieves the full text content of a specific chunk/article using its ID.
+* **Inputs:** `article_id` (str).
+* **Output:** List of article metadata (ID, Title, Area, Content).
+* **Agent Strategy:** Used when search results are ambiguous (e.g., mixed areas). The agent calls this tool to read the full content of a similar article to make a more informed decision.
