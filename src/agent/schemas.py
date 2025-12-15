@@ -1,6 +1,14 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, TypedDict, Optional
 
+class AgentState(TypedDict):
+    # Input
+    input_text: str          # The raw text of the article to be processed
+    
+    # Outputs from Agents
+    classification: Optional[str]  # "Physics", "Biology", etc.
+    extraction: Optional[dict]     # The strict JSON output
+    review: Optional[str]          # The markdown review
 
 class ClassifierResponse(BaseModel):
     """
