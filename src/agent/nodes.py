@@ -29,7 +29,7 @@ client = MultiServerMCPClient(
 )
 
 
-async def classify_paper(state: AgentState) -> AgentState:
+async def classifier_node(state: AgentState) -> AgentState:
     """
     Agent 1: The Classifier.
     Classifies the input article into one of the existing areas.
@@ -95,7 +95,7 @@ def reviewer_node(state: AgentState) -> AgentState:
     Agent 3: The Reviewer.
     Analyzes the text and produces a critical review in Portuguese.
     """
-    input_message = {"messages": [{"role": "user", "content": RANDOM_PAPER}]}
+    input_message = {"messages": [{"role": "user", "content": state["input_text"]}]}
 
     agent = create_agent(
         model=llm,
@@ -116,7 +116,7 @@ def reviewer_node(state: AgentState) -> AgentState:
 
 if __name__ == "__main__":
     # import asyncio
-    # asyncio.run(classify_paper())
+    # asyncio.run(classifier_node())
 
     # extractor_node()
 
