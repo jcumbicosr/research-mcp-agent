@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+from langchain.agents import create_agent
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 load_dotenv()
@@ -9,12 +10,16 @@ llm = ChatGoogleGenerativeAI(
     max_retries=2
 )
 
-messages = [
-    (
-        "system",
-        "You are a helpful assistant that translates English to French. Translate the user sentence.",
-    ),
-    ("human", "I love programming."),
-]
-ai_msg = llm.invoke(messages)
-print(ai_msg)
+
+def classify_paper():
+    text = "A sport is an activity involving physical exertion and skill in which an individual or team competes against another or others for entertainment."  
+    input_message = {"messages": [{"role": "user", "content": text}]}
+
+    agent = create_agent(
+        model=llm,
+        system_prompt="You are a text classification assistant. Classify the following text into one of these categories: 'sports', 'politics', 'technology', 'entertainment'."
+    )
+
+    response = agent.invoke(input_message)
+    print(response)
+
