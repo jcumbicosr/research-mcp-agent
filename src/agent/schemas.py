@@ -6,7 +6,7 @@ class ClassifierResponse(BaseModel):
     """
     Pydantic model defining the EXACT JSON structure required by the classification task.
     """
-    category: str = Field(description="The name of the area.")
+    area: str = Field(description="The name of the area.")
 
 class ExtractionResponse(BaseModel):
     """
