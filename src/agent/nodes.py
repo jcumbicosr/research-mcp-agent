@@ -6,6 +6,8 @@ from langchain.agents.structured_output import ToolStrategy
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_mcp_adapters.tools import load_mcp_tools
 
+from src.agent.prompts import CLASSIFIER_PROMPT
+
 
 load_dotenv()
 
@@ -26,11 +28,17 @@ client = MultiServerMCPClient(
 )
 
 class ClassifierResponse(BaseModel):
-    category: str = Field(description="The name of the category.")
+    category: str = Field(description="The name of the area.")
 
 async def classify_paper():
-    text = "A sport is an activity involving physical exertion and skill in which an individual or team competes against another or others for entertainment."  
-    input_message = {"messages": [{"role": "user", "content": text}]}
+    paper = """
+    Field of study in artificial intelligence concerned with the development and study 
+    of statistical algorithms that can learn from data and generalise to unseen data, 
+    and thus perform tasks without explicit instructions. Advances in the field of deep 
+    learning have allowed neural networks, a class of statistical algorithms, to surpass 
+    many previous machine learning approaches in performance.
+    """  
+    input_message = {"messages": [{"role": "user", "content": paper}]}
 
     async with client.session("research_article") as session:
         tools = await load_mcp_tools(session)
@@ -38,13 +46,14 @@ async def classify_paper():
         agent = create_agent(
             model=llm,
             tools=tools,
-            system_prompt="You are a text classification assistant. Classify the following text into one of these categories: 'sports', 'politics', 'technology', 'entertainment'.",
+            system_prompt=CLASSIFIER_PROMPT,
             response_format=ToolStrategy(ClassifierResponse),
         )
 
-        response = agent.invoke(input_message)
+        response = await agent.ainvoke(input_message)
         print(response["structured_response"])
 
 if __name__ == "__main__":
-    classify_paper()
+    import asyncio
+    asyncio.run(classify_paper())
 
