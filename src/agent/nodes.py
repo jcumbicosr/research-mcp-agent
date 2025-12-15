@@ -10,6 +10,12 @@ from src.agent.prompts import CLASSIFIER_PROMPT, EXTRACTION_PROMPT, REVIEWER_PRO
 from src.agent.schemas import ClassifierResponse, ExtractionResponse
 from src.agent.schemas import AgentState
 
+import logging
+
+# Set up logging
+logger = logging.getLogger(__name__)
+
+# Logging environment variables
 load_dotenv()
 
 llm = ChatGoogleGenerativeAI(
@@ -34,10 +40,14 @@ async def classifier_node(state: AgentState) -> AgentState:
     Agent 1: The Classifier.
     Classifies the input article into one of the existing areas.
     """
+    logger.info("=" * 50)
+    logger.info("CLASSIFIER NODE - Starting")
+
     input_message = {"messages": [{"role": "user", "content": state["input_text"]}]}
 
     async with client.session("research_article") as session:
         tools = await load_mcp_tools(session)
+        logger.info(f"Loaded {len(tools)} MCP tools")
 
         agent = create_agent(
             model=llm,
@@ -47,15 +57,24 @@ async def classifier_node(state: AgentState) -> AgentState:
         )
 
         response = await agent.ainvoke(input_message)
+        logger.info("Classifier agent response received")
 
         try:    
             # Convert the Pydantic object to a standard Python dictionary.
             final_json_dict = response["structured_response"].model_dump()
+            
+            area = final_json_dict["area"]
+            logger.info(f"Classification successful: area='{area}'")
         except Exception as e:
+            logger.error(f"Classification failed: {str(e)}")
+
             # Fallback state in case model fails to generate valid structure
             final_json_dict = {
                 "area": "unclassified"
             }
+
+    logger.info("CLASSIFIER NODE - Completed")
+    logger.info("=" * 50)
     
     return {"area": final_json_dict["area"]}
 
@@ -64,6 +83,9 @@ def extractor_node(state: AgentState) -> AgentState:
     Agent 2: The Extractor.
     Analyzes the text and forces output into the strict Pydantic schema.
     """
+    logger.info("=" * 50)
+    logger.info("EXTRACTOR NODE - Starting")
+    logger.info(f"Current area: {state.get('area', 'N/A')}")
 
     input_message = {"messages": [{"role": "user", "content": state["input_text"]}]}
 
@@ -74,19 +96,28 @@ def extractor_node(state: AgentState) -> AgentState:
     )
 
     response = agent.invoke(input_message)
+    logger.info("Extractor agent response received")
     
     try:    
         # Convert the Pydantic object to a standard Python dictionary.
         # IMPORTANT: by_alias=True ensures the keys have the typo required by the prompt.
         final_json_dict = response["structured_response"].model_dump(by_alias=True)
+
+        logger.info("Extraction successful")
+        logger.info(f"Extracted fields: {list(final_json_dict.keys())}")
         
     except Exception as e:
+        logger.error(f"Extraction failed: {str(e)}")
+
         # Fallback state in case model fails to generate valid structure
         final_json_dict = {
             "what problem does the artcle propose to solve?": "Error during extraction",
             "step by step on how to solve it": ["Error"],
             "conclusion": f"Could not extract due to error: {e}"
         }
+    
+    logger.info("EXTRACTOR NODE - Completed")
+    logger.info("=" * 50)
 
     return {"extraction": final_json_dict}
 
@@ -95,6 +126,11 @@ def reviewer_node(state: AgentState) -> AgentState:
     Agent 3: The Reviewer.
     Analyzes the text and produces a critical review in Portuguese.
     """
+    logger.info("=" * 50)
+    logger.info("REVIEWER NODE - Starting")
+    logger.info(f"Current area: {state.get('area', 'N/A')}")
+    logger.info(f"Extraction completed: {state.get('extraction') is not None}")
+
     input_message = {"messages": [{"role": "user", "content": state["input_text"]}]}
 
     agent = create_agent(
@@ -103,14 +139,23 @@ def reviewer_node(state: AgentState) -> AgentState:
     )
 
     response = agent.invoke(input_message)
+    logger.info("Reviewer agent response received")
 
     try:
         # Extract the content of the last message in the response
         review_content = response['messages'][-1].content
+
+        logger.info(f"Review generated successfully")
+        logger.info(f"Review length: {len(review_content)} characters")
         
     except Exception as e:
+        logger.error(f"Review generation failed: {str(e)}")
+
         review_content = f"Erro ao gerar resenha: {str(e)}"
 
+    logger.info("REVIEWER NODE - Completed")
+    logger.info("=" * 50)
+    
     return {"review_markdown": review_content}
 
 
