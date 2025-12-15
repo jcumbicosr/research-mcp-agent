@@ -3,6 +3,7 @@ from langchain.agents import create_agent
 from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel, Field
 from langchain.agents.structured_output import ToolStrategy
+from langchain_mcp_adapters.client import MultiServerMCPClient
 
 load_dotenv()
 
