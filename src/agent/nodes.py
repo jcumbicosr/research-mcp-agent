@@ -6,7 +6,7 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_mcp_adapters.tools import load_mcp_tools
 
 from src.agent.prompts import RANDOM_PAPER
-from src.agent.prompts import CLASSIFIER_PROMPT, EXTRACTION_PROMPT
+from src.agent.prompts import CLASSIFIER_PROMPT, EXTRACTION_PROMPT, REVIEWER_PROMPT
 from src.agent.schemas import ClassifierResponse, ExtractionResponse
 
 load_dotenv()
@@ -92,11 +92,36 @@ def extractor_node():
 
     print(final_json_dict)
 
+def reviewer_node():
+    """
+    Agent 3: The Reviewer.
+    Analyzes the text and produces a critical review in Portuguese.
+    """
+    input_message = {"messages": [{"role": "user", "content": RANDOM_PAPER}]}
+
+    agent = create_agent(
+        model=llm,
+        system_prompt=REVIEWER_PROMPT,
+    )
+
+    response = agent.invoke(input_message)
+
+    try:
+        # Extract the content of the last message in the response
+        review_content = response['messages'][-1].content
+        
+    except Exception as e:
+        review_content = f"Erro ao gerar resenha: {str(e)}"
+
+    print(review_content)
+
 
 if __name__ == "__main__":
     # import asyncio
     # asyncio.run(classify_paper())
 
-    extractor_node()
+    # extractor_node()
+
+    reviewer_node()
 
 

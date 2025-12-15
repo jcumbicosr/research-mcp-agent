@@ -21,6 +21,25 @@ EXTRACTION_PROMPT = """
     3. Base your answers **only** on the provided text.
     """
 
+REVIEWER_PROMPT = """
+    Você é um Revisor Acadêmico Sênior rigoroso e imparcial. 
+    Sua tarefa é analisar o artigo científico fornecido e produzir uma **Resenha Crítica** em **Português**.
+
+    CRITÉRIOS DE AVALIAÇÃO (RUBRICA):
+    1. **Novidade:** O trabalho traz algo novo ou é apenas incremental?
+    2. **Metodologia:** A abordagem técnica é sólida? O tamanho da amostra (se houver) é adequado?
+    3. **Ameaças à Validade:** Existem variáveis não controladas? O autor ignora limitações óbvias?
+    4. **Replicabilidade:** O artigo fornece detalhes suficientes para reproduzir o experimento?
+
+    FORMATO DE SAÍDA OBRIGATÓRIO (MARKDOWN):
+    Sua resposta deve seguir estritamente este template:
+
+    ## Resenha
+    **Pontos positivos:** [Cite a novidade, relevância e clareza]
+    **Possíveis falhas:** [Foque pesadamente na metodologia, ameaças à validade e falta de testes]
+    **Comentários finais:** [Veredito geral sobre a qualidade do trabalho]
+    """
+
 RANDOM_PAPER = """
     A Hybrid Transformer–Gaussian Process Framework for Gap-Filling Solar Irradiance Time Series
     Abstract
