@@ -7,6 +7,7 @@ wheels/
 data/vector_store
 *.egg-info
 .vscode
+.env
 
 # Virtual environments
 .venv
