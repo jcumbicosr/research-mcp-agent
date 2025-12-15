@@ -1,12 +1,12 @@
 from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain_google_genai import ChatGoogleGenerativeAI
-from pydantic import BaseModel, Field
 from langchain.agents.structured_output import ToolStrategy
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_mcp_adapters.tools import load_mcp_tools
 
 from src.agent.prompts import CLASSIFIER_PROMPT
+from src.agent.schemas import ClassifierResponse
 
 
 load_dotenv()
@@ -27,8 +27,6 @@ client = MultiServerMCPClient(
     }
 )
 
-class ClassifierResponse(BaseModel):
-    category: str = Field(description="The name of the area.")
 
 async def classify_paper():
     paper = """
@@ -52,6 +50,7 @@ async def classify_paper():
 
         response = await agent.ainvoke(input_message)
         print(response["structured_response"])
+
 
 if __name__ == "__main__":
     import asyncio
