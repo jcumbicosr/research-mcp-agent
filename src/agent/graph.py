@@ -5,11 +5,6 @@ from src.agent.prompts import RANDOM_PAPER
 
 import logging
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-
 logger = logging.getLogger(__name__)
 
 # 1. Initialize the Graph
@@ -83,4 +78,3 @@ if __name__ == "__main__":
     # Print the structured output
     print(json.dumps(output, indent=4, ensure_ascii=False))
 
-    

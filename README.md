@@ -55,10 +55,6 @@ The system uses **ChromaDB** as the persistent vector store.
 
 * **Metadata Filtering:** Each vector is indexed with its source filename, research area, and document metadata to allow for filtered queries (e.g., "Retrieve only from Computer_Science").
 
-
-## 🤖 MCP Server Architecture
-This project exposes the knowledge base to AI agents using the **Model Context Protocol (MCP)** via a `FastMCP` server. This architecture decouples the database logic from the agentic reasoning, allowing the agent to "consult" the literature dynamically.
-
 ## 🤖 MCP Server Architecture
 
 This project exposes the knowledge base to AI agents using the **Model Context Protocol (MCP)** via a `FastMCP` server. This architecture decouples the database logic from the agentic reasoning, allowing the agent to "consult" the literature dynamically.
@@ -78,3 +74,26 @@ The server exposes two primary tools designed to support an **Agentic Classifica
 * **Inputs:** `article_id` (str).
 * **Output:** List of article metadata (ID, Title, Area, Content).
 * **Agent Strategy:** Used when search results are ambiguous (e.g., mixed areas). The agent calls this tool to read the full content of a similar article to make a more informed decision.
+
+## Research MCP Agent
+
+This project implements a decoupled **Multi-Agent architecture** designed to automate the analysis of scientific literature. It leverages **LangGraph** for orchestration and the **Model Context Protocol (MCP)** to ground agentic reasoning in a local vector database.
+
+The system performs three key tasks autonomously:
+1.  **Classification:** Identifies the scientific domain of an input text by comparing it against a known knowledge base.
+2.  **Extraction:** Performs structured data extraction (JSON) of problem statements and methodologies.
+3.  **Critical Review:** Generates a comprehensive critical review in Portuguese.
+
+---
+
+## 🏗️ Architecture
+
+The system is built as a state machine using **LangGraph**. The workflow consists of three specialized nodes that pass a shared state (`AgentState`) sequentially.
+
+```mermaid
+graph LR
+    Start --> Classify[Classifier Node]
+    Classify --> Extract[Extractor Node]
+    Extract --> Review[Reviewer Node]
+    Review --> End
+
