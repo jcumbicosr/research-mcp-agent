@@ -8,6 +8,7 @@ from langchain_mcp_adapters.tools import load_mcp_tools
 from src.agent.prompts import RANDOM_PAPER
 from src.agent.prompts import CLASSIFIER_PROMPT, EXTRACTION_PROMPT, REVIEWER_PROMPT
 from src.agent.schemas import ClassifierResponse, ExtractionResponse
+from src.agent.schemas import AgentState
 
 load_dotenv()
 
@@ -28,15 +29,12 @@ client = MultiServerMCPClient(
 )
 
 
-async def classify_paper():
-    paper = """
-    Field of study in artificial intelligence concerned with the development and study 
-    of statistical algorithms that can learn from data and generalise to unseen data, 
-    and thus perform tasks without explicit instructions. Advances in the field of deep 
-    learning have allowed neural networks, a class of statistical algorithms, to surpass 
-    many previous machine learning approaches in performance.
-    """  
-    input_message = {"messages": [{"role": "user", "content": paper}]}
+async def classify_paper(state: AgentState) -> AgentState:
+    """
+    Agent 1: The Classifier.
+    Classifies the input article into one of the existing areas.
+    """
+    input_message = {"messages": [{"role": "user", "content": state["input_text"]}]}
 
     async with client.session("research_article") as session:
         tools = await load_mcp_tools(session)
@@ -49,7 +47,6 @@ async def classify_paper():
         )
 
         response = await agent.ainvoke(input_message)
-        print(response["structured_response"])
 
         try:    
             # Convert the Pydantic object to a standard Python dictionary.
@@ -59,14 +56,16 @@ async def classify_paper():
             final_json_dict = {
                 "area": "unclassified"
             }
+    
+    return {"area": final_json_dict["area"]}
 
-def extractor_node():
+def extractor_node(state: AgentState) -> AgentState:
     """
     Agent 2: The Extractor.
     Analyzes the text and forces output into the strict Pydantic schema.
     """
 
-    input_message = {"messages": [{"role": "user", "content": RANDOM_PAPER}]}
+    input_message = {"messages": [{"role": "user", "content": state["input_text"]}]}
 
     agent = create_agent(
         model=llm,
@@ -75,7 +74,6 @@ def extractor_node():
     )
 
     response = agent.invoke(input_message)
-    print(response["structured_response"])
     
     try:    
         # Convert the Pydantic object to a standard Python dictionary.
@@ -90,9 +88,9 @@ def extractor_node():
             "conclusion": f"Could not extract due to error: {e}"
         }
 
-    print(final_json_dict)
+    return {"extraction": final_json_dict}
 
-def reviewer_node():
+def reviewer_node(state: AgentState) -> AgentState:
     """
     Agent 3: The Reviewer.
     Analyzes the text and produces a critical review in Portuguese.
@@ -113,7 +111,7 @@ def reviewer_node():
     except Exception as e:
         review_content = f"Erro ao gerar resenha: {str(e)}"
 
-    print(review_content)
+    return {"review_markdown": review_content}
 
 
 if __name__ == "__main__":

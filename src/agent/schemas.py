@@ -6,9 +6,9 @@ class AgentState(TypedDict):
     input_text: str          # The raw text of the article to be processed
     
     # Outputs from Agents
-    classification: Optional[str]  # "Physics", "Biology", etc.
-    extraction: Optional[dict]     # The strict JSON output
-    review: Optional[str]          # The markdown review
+    area: Optional[str]             # "Physics", "Biology", etc.
+    extraction: Optional[dict]      # The strict JSON output
+    review_markdown: Optional[str]  # The markdown review
 
 class ClassifierResponse(BaseModel):
     """
