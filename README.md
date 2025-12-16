@@ -52,7 +52,7 @@ The entry point is `main.py`. The agent supports three types of input files via 
 ### Option A: Analyze Raw Text
 Processes a plain text or markdown file.
 ```bash
-uv run main.py --file-path samples/input_article_1.pdf
+uv run main.py --file-path samples/input_article_1.txt
 ```
 
 ### Option B: Analyze a PDF File
@@ -64,7 +64,7 @@ uv run main.py --file-path samples/input_article_2.pdf
 ### Option C: Analyze an arXiv Paper (.url)
 Create a `.url` file containing a single arXiv link (e.g., `https://arxiv.org/abs/2310.xxxxx`).
 ```bash
-uv run main.py --file-path samples/input_article_3.pdf
+uv run main.py --file-path samples/input_article_3.url
 ```
 The system will automatically download the paper, extract text, and process it.
 
