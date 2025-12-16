@@ -56,7 +56,7 @@ def read_file_content(file_path: str) -> str:
 
 
 @argbind.bind(without_prefix=True)
-def main(file_path: str = "samples/input_article_1.txt"):
+def main(file_path: str = "samples/paper.pdf"):
     
     try:
         # 1. Read Content
