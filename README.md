@@ -1,6 +1,83 @@
 # Research MCP Agent
 This project implements a decoupled Multi-Agent architecture utilizing the Model Context Protocol (MCP). The system consumes a Vector Store knowledge base to classify scientific articles, perform structured data extraction (JSON), and generate automated critical reviews. The solution demonstrates efficient integration between AI Agents and external tools via MCP servers.
 
+## 🚀 Getting Started
+
+This guide provides step-by-step instructions to set up and run the **Research MCP Agent** on any host machine.
+
+## 📋 Prerequisites
+
+* **Python 3.10+**
+* **uv** (An extremely fast Python package installer and resolver).
+    * *Install uv:* `curl -LsSf https://astral.sh/uv/install.sh | sh`
+
+## 🛠️ Installation
+
+1.  **Clone the Repository**
+    ```bash
+    git clone https://github.com/jcumbicosr/research-mcp-agent.git
+    cd research-mcp-agent
+    ```
+
+2.  **Set up Virtual Environment & Install Dependencies**
+    We use `uv` for lightning-fast package management.
+    ```bash
+    # Create a virtual environment
+    uv venv
+
+    # Activate the environment
+    # On macOS/Linux:
+    source .venv/bin/activate
+    # On Windows:
+    # .venv\Scripts\activate
+
+    # Install dependencies
+    uv sync --locked
+    ```
+
+3.  **Configuration**
+    Create a `.env` file in the root directory to store your API keys.
+    ```bash
+    touch .env
+    ```
+    Open `.env` and add your Google Gemini API key:
+    ```env
+    GOOGLE_API_KEY=your_actual_api_key_here
+    ```
+---
+## 🏃 Running the Agent
+
+The entry point is `main.py`. The agent supports three types of input files via the `--file-path` argument.
+
+### Option A: Analyze Raw Text
+Processes a plain text or markdown file.
+```bash
+uv run main.py --file-path samples/input_article_1.pdf
+```
+
+### Option B: Analyze a PDF File
+Directly processes a local PDF.
+```bash
+uv run main.py --file-path samples/input_article_2.pdf
+```
+
+### Option C: Analyze an arXiv Paper (.url)
+Create a `.url` file containing a single arXiv link (e.g., `https://arxiv.org/abs/2310.xxxxx`).
+```bash
+uv run main.py --file-path samples/input_article_3.pdf
+```
+The system will automatically download the paper, extract text, and process it.
+
+## 📦 Outputs & Artifacts
+For every execution, the system generates three files in the same directory as the input file, appended with the base filename:
+
+| File | Description |
+|------|-------------|
+| _full.json | The complete structured output (Area, Extraction, Review).|
+| _extraction.json | JSON containing only the problem statement and methodology.|
+| _review.md | The critical review in Markdown format (Portuguese).```
+------------------
+
 ## 📂 Data Ingestion
 The system employs a hierarchical directory structure to organize the knowledge base. The ingestion script (`loader.py`) recursively scans subdirectories within `data/raw_articles/`. The name of the subdirectory is automatically extracted and assigned as the "Area" metadata field for all contained documents.
 ```
@@ -54,6 +131,11 @@ The system uses **ChromaDB** as the persistent vector store.
 * **Storage Path:** `data/vector_store/`
 
 * **Metadata Filtering:** Each vector is indexed with its source filename, research area, and document metadata to allow for filtered queries (e.g., "Retrieve only from Computer_Science").
+
+To update the vector store based on the ingestion structure folder, run the next command:
+```bash
+uv run -m src.ingestion.indexer
+```
 
 ## 🤖 MCP Server Architecture
 
