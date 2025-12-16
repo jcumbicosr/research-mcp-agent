@@ -1,0 +1,11 @@
+{
+  "what problem does the artcle propose to solve?": "Incomplete measurements of Global Horizontal Irradiance (GHI) remain a critical limitation for reliable solar resource assessment and photovoltaic system operation, requiring accurate and physically plausible GHI gap-filling.",
+  "step by step on how to solve it": [
+    "Data Preprocessing",
+    "Transformer-Based Temporal Encoding",
+    "Initial Gap Reconstruction",
+    "Gaussian Process Refinement",
+    "Post-Processing and Evaluation"
+  ],
+  "conclusion": "This study introduces a hybrid Transformer–Gaussian Process framework for reconstructing missing solar irradiance data. Combining deep temporal representation learning with probabilistic interpolation leads to more accurate and physically consistent gap-filling, making the approach well-suited for operational solar energy applications and extendable to other geophysical time series."
+}

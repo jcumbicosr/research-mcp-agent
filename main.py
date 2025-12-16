@@ -3,6 +3,7 @@ import argbind
 import json
 import logging
 import arxiv
+import asyncio
 from pathlib import Path
 from pypdf import PdfReader
 from tempfile import TemporaryDirectory
@@ -154,19 +155,65 @@ def read_file_content(file_path: str) -> str:
     else:
         return _read_text_file(path)
 
+def save_outputs(base_filename: str, result: dict):
+    """
+    Saves the specific artifacts required by the challenge deliverables.
+    1. full_output.json (The combined template)
+    2. extraction.json (Just the extraction part)
+    3. review.md (Just the markdown part)
+    """
+    output_dir = Path(base_filename).parent 
+    output_dir.mkdir(exist_ok=True)
+    
+    base_name = Path(base_filename).stem
+    
+    # 1. Save Full Agent Output (The "Template de Saída")
+    full_path = output_dir / f"{base_name}_full.json"
+    with open(full_path, "w", encoding="utf-8") as f:
+        json.dump(result, f, indent=2, ensure_ascii=False)
+    
+    # 2. Save Extraction Only (deliverable requirement)
+    extraction_path = output_dir / f"{base_name}_extraction.json"
+    with open(extraction_path, "w", encoding="utf-8") as f:
+        json.dump(result["extraction"], f, indent=2, ensure_ascii=False)
+
+    # 3. Save Review Markdown (deliverable requirement)
+    review_path = output_dir / f"{base_name}_review.md"
+    with open(review_path, "w", encoding="utf-8") as f:
+        f.write(result["review_markdown"])
+
+    logger.info(f"Artifacts saved to {output_dir}/")
+    logger.info(f"   - {full_path}")
+    logger.info(f"   - {review_path}")
 
 @argbind.bind(without_prefix=True)
-def main(file_path: str = "samples/input_article_1.txt"):
-    
+def main(file_path: str = "samples/input_article_1.txt") -> None:
+    """
+    Main entry point for the Multi-Agent System workflow.
+    Orchestrates the complete pipeline: reading input content, executing the multi-agent
+    system, displaying results, and saving outputs to files.
+    Args:
+        file_path (str): Path to the input text file to be processed. 
+                        Defaults to "samples/input_article_1.txt".
+    Raises:
+        Exception: Logs critical errors and exits with status code 1 if any step fails.
+    Returns:
+        None
+    """
     try:
-        # 1. Read Content
+        # Read Content
         input_text = read_file_content(file_path)
         
-        # 2. Run the Multi-Agent System
+        # Run the Multi-Agent System
         logger.info("Starting Multi-Agent Workflow...")
-        result = run_agent(input_text)
-        
-        
+        result = asyncio.run(run_agent(input_text))
+
+        # Output the result
+        print(json.dumps(result, indent=4))
+
+        # Save Files
+        save_outputs(file_path, result)
+
     except Exception as e:
         logger.critical(f"Execution Failed: {e}")
         exit(1)
