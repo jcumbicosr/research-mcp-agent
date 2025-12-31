@@ -1,5 +1,26 @@
-# Research MCP Agent
-This project implements a decoupled Multi-Agent architecture utilizing the Model Context Protocol (MCP). The system consumes a Vector Store knowledge base to classify scientific articles, perform structured data extraction (JSON), and generate automated critical reviews. The solution demonstrates efficient integration between AI Agents and external tools via MCP servers.
+# 🧠 Research MCP Agent
+
+This project implements a decoupled **Multi-Agent architecture** designed to automate the analysis of scientific literature. It leverages **LangGraph** for orchestration and the **Model Context Protocol (MCP)** to ground agentic reasoning in a local vector database.
+
+The system performs three key tasks autonomously:
+1.  **Classification:** Identifies the scientific domain of an input text (PDF, URL, or Text) by comparing it against a curated knowledge base of **9 articles** across **3 scientific areas**.
+2.  **Extraction:** Performs structured data extraction (JSON) of problem statements and methodologies, strictly adhering to the requested schema.
+3.  **Critical Review:** Generates a comprehensive critical review in Portuguese.
+
+---
+
+## 🏗️ Architectural Decisions & Framework Justification
+
+To ensure **flexibility, comprehensiveness, and scalability**, the following stack was chosen:
+
+| Component | Choice | Justification |
+| :--- | :--- | :--- |
+| **Orchestration** | **LangGraph** | Chosen over **CrewAI** or **AutoGen**. While CrewAI is good for generic role-playing, **LangGraph** provides fine-grained control over state and execution flow (`Classify -> Extract -> Review`). It allows for a deterministic pipeline essential for this specific challenge, avoiding the infinite loops common in "chatty" multi-agent frameworks. |
+| **Connectivity** | **MCP (FastMCP)** | Decouples the "Brain" (Agent) from the "Knowledge" (Vector Store). This allows the Vector Store to be swapped or hosted remotely without changing the Agent's code. |
+| **Vector Store** | **ChromaDB** | Selected for its simplicity and local persistence (no Docker required for evaluation), making the repository easier to clone and run. |
+| **LLM** | **Gemini 2.5** | High context window and superior reasoning speed for document analysis. |
+
+---
 
 ## 🚀 Getting Started
 
@@ -7,7 +28,7 @@ This guide provides step-by-step instructions to set up and run the **Research M
 
 ## 📋 Prerequisites
 
-* **Python 3.10+**
+* **Python 3.12**
 * **uv** (An extremely fast Python package installer and resolver).
     * *Install uv:* `curl -LsSf https://astral.sh/uv/install.sh | sh`
 
@@ -29,7 +50,7 @@ This guide provides step-by-step instructions to set up and run the **Research M
     # On macOS/Linux:
     source .venv/bin/activate
     # On Windows:
-    # .venv\Scripts\activate
+    .venv\Scripts\activate
 
     # Install dependencies
     uv sync --locked
@@ -77,6 +98,21 @@ For every execution, the system generates three files in the same directory as t
 | _extraction.json | JSON containing only the problem statement and methodology.|
 | _review.md | The critical review in Markdown format (Portuguese).```
 ------------------
+
+1. Extraction JSON  
+    Matches the requested schema (including the artcle typo handling). File: `*_extraction.json`
+    ```JSON
+    {
+    "what problem does the artcle propose to solve?": "Extracted text...",
+    "step by step on how to solve it": ["Step 1", "Step 2"],
+    "conclusion": "Conclusion text..."
+    }
+    ```
+2. Critical Review (Portuguese)  
+    A detailed markdown review including:
+    * Pontos Positivos (Strengths)
+    * Possíveis Falhas (Weaknesses/Methodology Checks)
+    * Comentários Finais
 
 ## 📂 Data Ingestion
 The system employs a hierarchical directory structure to organize the knowledge base. The ingestion script (`loader.py`) recursively scans subdirectories within `data/raw_articles/`. The name of the subdirectory is automatically extracted and assigned as the "Area" metadata field for all contained documents.
