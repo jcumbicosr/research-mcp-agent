@@ -9,7 +9,7 @@ from pypdf import PdfReader
 from tempfile import TemporaryDirectory
 
 # Import the graph runner
-from src.agent.graph import run_agent
+from research_mcp_agent.agent.graph import run_agent
 
 
 # Configure logging
@@ -222,3 +222,4 @@ if __name__ == "__main__":
     args = argbind.parse_args()
     with argbind.scope(args):
         main()
+

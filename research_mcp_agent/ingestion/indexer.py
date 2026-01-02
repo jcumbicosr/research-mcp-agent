@@ -2,7 +2,7 @@ import nltk
 import chromadb
 from pathlib import Path
 from typing import List, Dict, Any
-from src.ingestion.loader import process_pdfs
+from research_mcp_agent.ingestion.loader import process_pdfs
 
 
 # Download required NLTK resources

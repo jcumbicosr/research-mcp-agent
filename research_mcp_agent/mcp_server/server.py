@@ -1,6 +1,6 @@
 from fastmcp import FastMCP
 from typing import List, Dict, Any
-from src.ingestion.indexer import ChromaIndexer
+from research_mcp_agent.ingestion.indexer import ChromaIndexer
 
 # Initialize the FastMCP Server
 mcp = FastMCP("Scientific Article Server")

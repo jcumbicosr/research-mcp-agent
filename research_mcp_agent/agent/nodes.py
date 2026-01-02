@@ -5,10 +5,10 @@ from langchain.agents.structured_output import ToolStrategy
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_mcp_adapters.tools import load_mcp_tools
 
-from src.agent.prompts import RANDOM_PAPER
-from src.agent.prompts import CLASSIFIER_PROMPT, EXTRACTION_PROMPT, REVIEWER_PROMPT
-from src.agent.schemas import ClassifierResponse, ExtractionResponse
-from src.agent.schemas import AgentState
+from research_mcp_agent.agent.prompts import RANDOM_PAPER
+from research_mcp_agent.agent.prompts import CLASSIFIER_PROMPT, EXTRACTION_PROMPT, REVIEWER_PROMPT
+from research_mcp_agent.agent.schemas import ClassifierResponse, ExtractionResponse
+from research_mcp_agent.agent.schemas import AgentState
 
 import logging
 

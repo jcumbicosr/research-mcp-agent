@@ -1,7 +1,7 @@
 from langgraph.graph import StateGraph, END
-from src.agent.schemas import AgentState
-from src.agent.nodes import classifier_node, extractor_node, reviewer_node
-from src.agent.prompts import RANDOM_PAPER
+from research_mcp_agent.agent.schemas import AgentState
+from research_mcp_agent.agent.nodes import classifier_node, extractor_node, reviewer_node
+from research_mcp_agent.agent.prompts import RANDOM_PAPER
 
 import logging
 
