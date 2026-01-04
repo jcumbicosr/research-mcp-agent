@@ -1,5 +1,7 @@
 import nltk
 import chromadb
+import argbind
+import shutil
 from pathlib import Path
 from typing import List, Dict, Any
 from research_mcp_agent.ingestion.loader import process_pdfs
@@ -157,23 +159,41 @@ class ChromaIndexer:
                 ]
         
         return output
-    
-def main():
+
+@argbind.bind(without_prefix=True)    
+def main(input_dir: str = "data/raw_articles/", reset_db: bool = False) -> None:
+    """
+    Main function to process PDFs, chunk text, and create a ChromaDB vector store.
+    Args:
+        input_dir (str): Directory containing structured folders with PDF files.
+        reset_db (bool): Whether to reset the vector store database if it exists.
+    """
     # Load and clead pdf files, add metadata
-    docs = process_pdfs(directory="data/raw_articles/")
+    path_dir = Path(input_dir)
+    docs = process_pdfs(directory=path_dir)
+
     # Chunk text
     docs = chunk_pdfs(documents=docs, max_sentences=8, overlap=1)
+    
+    # Path for vector store
+    path_db = Path(__file__).parent.parent / "vector_store"
+    # Reset DB if needed
+    if reset_db and path_db.exists():
+        shutil.rmtree(path_db)
+    
     # Create vector store
-    path_db = Path(__file__).parent.parent
-    vector_db = ChromaIndexer(persist_directory=path_db / "vector_store")
+    vector_db = ChromaIndexer(persist_directory=path_db)
     vector_db.create_collection(documents=docs)
+    
     # Test retrieve
-    results = vector_db.query(["Sentence talking about machine learning."], n_results=2)
-    print(f"Retrieve docs:\n{results['documents']}")
+    # results = vector_db.query(["Sentence talking about machine learning."], n_results=2)
+    # print(f"Retrieve docs:\n{results['documents']}")
 
 
 if __name__ == "__main__":
-    main()
+    args = argbind.parse_args()
+    with argbind.scope(args):
+        main()
 
     # Example usage
     # sample_documents = [
