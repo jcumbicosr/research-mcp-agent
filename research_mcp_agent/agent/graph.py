@@ -1,7 +1,7 @@
 from langgraph.graph import StateGraph, END
 from research_mcp_agent.agent.schemas import AgentState
 from research_mcp_agent.agent.nodes import classifier_node, extractor_node, reviewer_node
-from research_mcp_agent.agent.prompts import RANDOM_PAPER
+import asyncio
 
 import logging
 
@@ -65,12 +65,25 @@ async def run_agent(input_text: str):
     
     return final_output
 
+
+def run_graph(paper_text: str):
+    """
+    Synchronous wrapper to run the agent with the provided paper text.
+    Args:
+        paper_text (str): The text of the research paper to process.
+    Returns:
+        dict: The final output from the agent workflow.
+    """
+    output = asyncio.run(run_agent(paper_text))
+    return output
+
+
 if __name__ == "__main__":
-    import asyncio
+    from research_mcp_agent.agent.prompts import RANDOM_PAPER
     import json
     
     # Run the async function
-    output = asyncio.run(run_agent(RANDOM_PAPER))
+    output = run_graph(RANDOM_PAPER)
     
     print("\n" + "=" * 70)
     print("FINAL OUTPUT")
