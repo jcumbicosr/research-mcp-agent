@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import List, Dict, Any
 from research_mcp_agent.ingestion.loader import process_pdfs
 
-
 # Download required NLTK resources
 nltk.download('punkt', quiet=True)
 nltk.download('punkt_tab', quiet=True)
@@ -68,12 +67,12 @@ def chunk_pdfs(documents: List[Dict[str, str]], max_sentences: int = 5, overlap:
     return chunked_documents
 
 class ChromaIndexer:
-    def __init__(self, persist_directory: str = "data/vector_store/") -> None:
+    def __init__(self, persist_directory: Path = Path(__file__).parent.parent / "vector_store") -> None:
         """
         Initialize a ChromaDB client with persistent storage.
 
         Args:
-            persist_directory (str): Directory path for persistent storage.
+            persist_directory (Path): Directory path for persistent storage.
         """
         path_dir = Path(persist_directory)
         path_dir.mkdir(parents=True, exist_ok=True)
@@ -165,7 +164,8 @@ def main():
     # Chunk text
     docs = chunk_pdfs(documents=docs, max_sentences=8, overlap=1)
     # Create vector store
-    vector_db = ChromaIndexer(persist_directory="data/vector_store")
+    path_db = Path(__file__).parent.parent
+    vector_db = ChromaIndexer(persist_directory=path_db / "vector_store")
     vector_db.create_collection(documents=docs)
     # Test retrieve
     results = vector_db.query(["Sentence talking about machine learning."], n_results=2)

@@ -29,7 +29,7 @@ client = MultiServerMCPClient(
         "research_article": {
             "transport": "stdio",
             "command": "python",
-            "args": ["-m", "src.mcp_server.server"],
+            "args": ["-m", "research_mcp_agent.mcp_server.server"],
         }
     }
 )

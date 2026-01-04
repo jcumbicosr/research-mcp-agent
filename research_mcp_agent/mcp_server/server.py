@@ -1,12 +1,14 @@
 from fastmcp import FastMCP
 from typing import List, Dict, Any
 from research_mcp_agent.ingestion.indexer import ChromaIndexer
+from pathlib import Path
 
 # Initialize the FastMCP Server
 mcp = FastMCP("Scientific Article Server")
 
 # Database connection 
-db_client = ChromaIndexer(persist_directory="data/vector_store/")
+path_db = Path(__file__).parent.parent
+db_client = ChromaIndexer(persist_directory=path_db / "vector_store")
 
 # --- TOOLS ---
 
