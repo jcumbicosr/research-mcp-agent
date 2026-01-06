@@ -23,4 +23,7 @@ build-backend = "uv_build"
 [tool.uv.build-backend]
 module-root = ""
 
+[project.scripts]
+research-mcp-agent = "research_mcp_agent.cli:main"
+
 
