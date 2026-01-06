@@ -28,7 +28,7 @@ app = workflow.compile()
 logger.info("Workflow graph compilation complete")
 
 # --- Helper Function to Run the Agent ---
-async def run_agent(input_text: str):
+async def agent_workflow(input_text: str):
     """
     Main entry point to call the agent.
     """
@@ -74,7 +74,7 @@ def run_graph(paper_text: str):
     Returns:
         dict: The final output from the agent workflow.
     """
-    output = asyncio.run(run_agent(paper_text))
+    output = asyncio.run(agent_workflow(paper_text))
     return output
 
 

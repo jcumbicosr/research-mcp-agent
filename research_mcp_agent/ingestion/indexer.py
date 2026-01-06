@@ -1,6 +1,5 @@
 import nltk
 import chromadb
-import argbind
 import shutil
 from pathlib import Path
 from typing import List, Dict, Any
@@ -160,8 +159,8 @@ class ChromaIndexer:
         
         return output
 
-@argbind.bind(without_prefix=True)    
-def main(input_dir: str = "data/raw_articles/", reset_db: bool = False) -> None:
+    
+def run_create(input_dir: str = "data/raw_articles/", reset_db: bool = False) -> None:
     """
     Main function to process PDFs, chunk text, and create a ChromaDB vector store.
     Args:
@@ -191,9 +190,7 @@ def main(input_dir: str = "data/raw_articles/", reset_db: bool = False) -> None:
 
 
 if __name__ == "__main__":
-    args = argbind.parse_args()
-    with argbind.scope(args):
-        main()
+        run_create()
 
     # Example usage
     # sample_documents = [
