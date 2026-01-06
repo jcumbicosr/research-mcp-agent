@@ -28,24 +28,23 @@ def run_app(file_path: str = "samples/input_article_1.txt") -> None:
     Returns:
         None
     """
-    # try:
-    #     # Read Content
-    #     input_text = read_file_content(file_path)
+    try:
+        # Read Content
+        input_text = read_file_content(file_path)
         
-    #     # Run the Multi-Agent System
-    #     logger.info("Starting Multi-Agent Workflow...")
-    #     result = run_graph(input_text)
+        # Run the Multi-Agent System
+        logger.info("Starting Multi-Agent Workflow...")
+        result = run_graph(input_text)
 
-    #     # Output the result
-    #     print(json.dumps(result, indent=4))
+        # Output the result
+        print(json.dumps(result, indent=4))
 
-    #     # Save Files
-    #     save_outputs(file_path, result)
+        # Save Files
+        save_outputs(file_path, result)
 
-    # except Exception as e:
-    #     logger.critical(f"Execution Failed: {e}")
-    #     exit(1)
-    print("Runing the app...")
+    except Exception as e:
+        logger.critical(f"Execution Failed: {e}")
+        exit(1)
 
 
 

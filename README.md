@@ -64,28 +64,33 @@ This guide provides step-by-step instructions to set up and run the **Research M
     Open `.env` and add your Google Gemini API key:
     ```env
     GOOGLE_API_KEY=your_actual_api_key_here
+    ```  
+4.  **Create the vector store**  
+    To create the vector store based on the ingestion structure folder (see Data Ingestion section), run the next command:
+    ```bash
+    uv run main.py create --input_dir data/raw_articles
     ```
 ---
 ## 🏃 Running the Agent
 
-The entry point is `main.py`. The agent supports three types of input files via the `--file-path` argument.
+The entry point is `main.py` with subcommand `run`. The agent supports three types of input files via the `--file-path` argument.
 
 ### Option A: Analyze Raw Text
 Processes a plain text or markdown file.
 ```bash
-uv run main.py --file-path samples/input_article_1.txt
+uv run main.py run --file-path samples/input_article_1.txt
 ```
 
 ### Option B: Analyze a PDF File
 Directly processes a local PDF.
 ```bash
-uv run main.py --file-path samples/input_article_2.pdf
+uv run main.py run --file-path samples/input_article_2.pdf
 ```
 
 ### Option C: Analyze an arXiv Paper (.url)
 Create a `.url` file containing a single arXiv link (e.g., `https://arxiv.org/abs/2310.xxxxx`).
 ```bash
-uv run main.py --file-path samples/input_article_3.url
+uv run main.py run --file-path samples/input_article_3.url
 ```
 The system will automatically download the paper, extract text, and process it.
 
@@ -115,10 +120,9 @@ For every execution, the system generates three files in the same directory as t
     * Comentários Finais
 
 ## 📂 Data Ingestion
-The system employs a hierarchical directory structure to organize the knowledge base. The ingestion script (`loader.py`) recursively scans subdirectories within `data/raw_articles/`. The name of the subdirectory is automatically extracted and assigned as the "Area" metadata field for all contained documents.
+The system employs a hierarchical directory structure to organize the knowledge base. The ingestion script (`loader.py`) recursively scans subdirectories within `raw_articles/`. The name of the subdirectory is automatically extracted and assigned as the "Area" metadata field for all contained documents.
 ```
-data/
-└── raw_articles/
+raw_articles/
     ├── Physics/
     │   ├── article1.pdf
     │   └── ...
@@ -164,14 +168,9 @@ The system uses **ChromaDB** as the persistent vector store.
 
 * **Collection:** `scientific_articles`
 
-* **Storage Path:** `data/vector_store/`
+* **Storage Path:** `vector_store/`
 
 * **Metadata Filtering:** Each vector is indexed with its source filename, research area, and document metadata to allow for filtered queries (e.g., "Retrieve only from Computer_Science").
-
-To update the vector store based on the ingestion structure folder, run the next command:
-```bash
-uv run -m src.ingestion.indexer
-```
 
 ## 🤖 MCP Server Architecture
 
