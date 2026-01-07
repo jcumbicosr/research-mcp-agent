@@ -124,7 +124,7 @@ class ChromaIndexer:
             metadatas=metadatas,
             ids=ids
         )
-        logger.info(f"Added {len(documents)} documents. \nTotal in collection: {self.collection.count()}")
+        logger.info(f"Added {len(documents)} documents. Total in collection: {self.collection.count()}")
 
     def query(self, query_texts: List[str], n_results: int = 1) -> Dict[str, Any]:
         """

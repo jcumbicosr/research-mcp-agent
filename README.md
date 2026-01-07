@@ -36,7 +36,7 @@ This guide provides step-by-step instructions to set up and run the **Research M
 
 1.  **Clone the Repository**
     ```bash
-    git clone [https://github.com/jcumbicosr/research-mcp-agent.git](https://github.com/jcumbicosr/research-mcp-agent.git)
+    git clone https://github.com/jcumbicosr/research-mcp-agent.git
     cd research-mcp-agent
     ```
 
@@ -45,8 +45,6 @@ This guide provides step-by-step instructions to set up and run the **Research M
     ```bash
     # Create a virtual environment and install dependencies
     uv sync
-    # Install the package itself
-    uv pip install -e .
 
     # Activate the environment
     # On macOS/Linux:
