@@ -36,24 +36,23 @@ This guide provides step-by-step instructions to set up and run the **Research M
 
 1.  **Clone the Repository**
     ```bash
-    git clone https://github.com/jcumbicosr/research-mcp-agent.git
+    git clone [https://github.com/jcumbicosr/research-mcp-agent.git](https://github.com/jcumbicosr/research-mcp-agent.git)
     cd research-mcp-agent
     ```
 
 2.  **Set up Virtual Environment & Install Dependencies**
-    We use `uv` for lightning-fast package management.
+    We use `uv` to manage dependencies and install the app as an editable package. This exposes the `research-mcp-agent` command in your terminal.
     ```bash
-    # Create a virtual environment
-    uv venv
+    # Create a virtual environment and install dependencies
+    uv sync
+    # Install the package itself
+    uv pip install -e .
 
     # Activate the environment
     # On macOS/Linux:
     source .venv/bin/activate
     # On Windows:
     .venv\Scripts\activate
-
-    # Install dependencies
-    uv sync --locked
     ```
 
 3.  **Configuration**
@@ -65,32 +64,31 @@ This guide provides step-by-step instructions to set up and run the **Research M
     ```env
     GOOGLE_API_KEY=your_actual_api_key_here
     ```  
-4.  **Create the vector store**  
-    To create the vector store based on the ingestion structure folder (see Data Ingestion section), run the next command:
+4.  **Create the vector store** To create the vector store based on the ingestion structure folder (see Data Ingestion section), run the following command using the exposed CLI:
     ```bash
-    uv run main.py create --input_dir data/raw_articles
+    research-mcp-agent create --input_dir data/raw_articles
     ```
 ---
 ## 🏃 Running the Agent
 
-The entry point is `main.py` with subcommand `run`. The agent supports three types of input files via the `--file-path` argument.
+You can now run the agent directly using the `research-mcp-agent` command. The tool supports three types of input files via the `--file_path` argument.
 
 ### Option A: Analyze Raw Text
 Processes a plain text or markdown file.
 ```bash
-uv run main.py run --file-path samples/input_article_1.txt
+research-mcp-agent run --file_path samples/input_article_1.txt
 ```
 
 ### Option B: Analyze a PDF File
 Directly processes a local PDF.
 ```bash
-uv run main.py run --file-path samples/input_article_2.pdf
+research-mcp-agent run --file_path samples/input_article_2.pdf
 ```
 
 ### Option C: Analyze an arXiv Paper (.url)
 Create a `.url` file containing a single arXiv link (e.g., `https://arxiv.org/abs/2310.xxxxx`).
 ```bash
-uv run main.py run --file-path samples/input_article_3.url
+research-mcp-agent run --file_path samples/input_article_3.url
 ```
 The system will automatically download the paper, extract text, and process it.
 

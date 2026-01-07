@@ -11,6 +11,10 @@ nltk.download('punkt_tab', quiet=True)
 
 from nltk.tokenize import sent_tokenize
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 def chunk_text_by_sentences(raw_text: str, max_sentences: int = 5, overlap: int = 1) -> List[str]:
     """
     Chunk text into smaller segments based on a maximum number of sentences with overlap.
@@ -83,9 +87,9 @@ class ChromaIndexer:
 
         self.collection = self.client.get_or_create_collection(name="scientific_articles")
         if self.collection.count() == 0:
-            print("The ChromaDB collection is void. Run create_collection() to initialize it.")
+            logger.info("The ChromaDB collection is empty. Run create_collection() to initialize it.")
         else:
-            print(f"Loaded existing collection with {self.collection.count()} documents.")
+            logger.info(f"Loaded existing collection with {self.collection.count()} documents.")
         
     def create_collection(self, documents: List[Dict[str, str]]) -> None:
         """
@@ -97,6 +101,8 @@ class ChromaIndexer:
         texts = []
         metadatas = []
         ids = []
+
+        logger.info("Running create_collection()...")
         
         for doc in documents:
             # Extract text (required)
@@ -118,7 +124,7 @@ class ChromaIndexer:
             metadatas=metadatas,
             ids=ids
         )
-        print(f"Added {len(documents)} documents. Total in collection: {self.collection.count()}")
+        logger.info(f"Added {len(documents)} documents. \nTotal in collection: {self.collection.count()}")
 
     def query(self, query_texts: List[str], n_results: int = 1) -> Dict[str, Any]:
         """

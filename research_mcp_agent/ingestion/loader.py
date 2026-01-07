@@ -3,6 +3,10 @@ from pypdf import PdfReader
 from pathlib import Path
 from typing import Dict, List
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 def load_and_clean_pdf(pdf_path: str) -> Dict[str, str]:
     """
     Load and extract text content from a PDF file.
@@ -117,7 +121,7 @@ def process_pdfs(directory: str="data/raw_articles/") -> List[Dict[str, str]]:
     for subdir in dir.iterdir():
         if subdir.is_dir():
             # Process PDFs in the subdirectory
-            print(f"Processing area: {subdir.name}...")
+            logger.info(f"Processing area: {subdir.name}...")
 
             for pdf_file in subdir.glob("*.pdf"):
                 pdf_data = load_and_clean_pdf(pdf_file)
